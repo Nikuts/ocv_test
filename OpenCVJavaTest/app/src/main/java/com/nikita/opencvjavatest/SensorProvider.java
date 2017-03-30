@@ -9,16 +9,23 @@ import android.util.Log;
 
 public class SensorProvider implements SensorEventListener {
     private static final String TAG = SensorProvider.class.getSimpleName();
-    private static final float DEFAULT_GYROSCOPE_SCALE_X = 8.7f;
-    private static final float DEFAULT_GYROSCOPE_SCALE_Y = DEFAULT_GYROSCOPE_SCALE_X + 0.3f;
-    private static final float ACCELEROMETER_SCALE = 10.0f;
+    private static final float DEFAULT_GYROSCOPE_SCALE_X = 13.0f; //8.2f;
+    private static final float DEFAULT_GYROSCOPE_SCALE_Y = DEFAULT_GYROSCOPE_SCALE_X; //+ 0.3f;
+    private static final float ACCELEROMETER_NOISE = 0.2f;
     private static final String mSynchronizeSensor = "mSynchronizeSensor";
 
+    private int mRotationVectorCount = 0;
+
     private float [] mDeltaRotationVector = {0, 0};
+    private float [] mLastTranslationVector = {0, 0};
     private float [] mDeltaTranslationVector = {0, 0};
+    private float mTranslationSpeed = 0;
+
+    private boolean mLinearAccelerationInitialized = false;
 
     private float mGyroscopeScaleX = DEFAULT_GYROSCOPE_SCALE_X;
     private float mGyroscopeScaleY = DEFAULT_GYROSCOPE_SCALE_Y;
+
 
     private SensorManager mSensorManager = null;
 
@@ -43,10 +50,28 @@ public class SensorProvider implements SensorEventListener {
                 case Sensor.TYPE_GYROSCOPE:
                     mDeltaRotationVector[0] += event.values[0];
                     mDeltaRotationVector[1] += event.values[1];
+                    mRotationVectorCount++;
+//                    Log.v(TAG, "rotation x,y: " + event.values[0] + ", " + event.values[1]);
                     break;
                 case Sensor.TYPE_ACCELEROMETER:
-                    mDeltaTranslationVector[0] += event.values[0];
-                    mDeltaTranslationVector[1] += event.values[1];
+                    float x = event.values[0];
+                    float y = event.values[1];
+                    if (!mLinearAccelerationInitialized) {
+                        mLastTranslationVector[0] = x;
+                        mLastTranslationVector[1] = y;
+                        mLinearAccelerationInitialized = true;
+                    }
+                    else {
+                        mDeltaTranslationVector[0] = Math.abs(mLastTranslationVector[0] - x);
+                        mDeltaTranslationVector[1] = Math.abs(mLastTranslationVector[1] - y);
+
+                        if (mDeltaTranslationVector[0] < ACCELEROMETER_NOISE) mDeltaTranslationVector[0] = 0;
+                        if (mDeltaTranslationVector[1] < ACCELEROMETER_NOISE) mDeltaTranslationVector[1] = 0;
+
+                        mLastTranslationVector[0] = x;
+                        mLastTranslationVector[1] = y;
+                        mTranslationSpeed = (float) Math.sqrt(Math.pow(mDeltaTranslationVector[0],2) + Math.pow(mDeltaTranslationVector[1],2));
+                    }
                     break;
             }
         }
@@ -54,31 +79,30 @@ public class SensorProvider implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
         Log.v(TAG,"onAccuracyChanged: " + sensor + ", accuracy: " + accuracy);
     }
 
     public float[] getDeltaRotationVector(){ //ox: same direction, oy: opposite direction
         float[] deltaRotationVector = {0, 0};
         synchronized (mSynchronizeSensor) {
-            deltaRotationVector[0] = (mDeltaRotationVector[0] * mGyroscopeScaleX);
-            deltaRotationVector[1] = (mDeltaRotationVector[1] * mGyroscopeScaleX);
+            deltaRotationVector[0] = (mDeltaRotationVector[0]/mRotationVectorCount * mGyroscopeScaleX);
+            deltaRotationVector[1] = (mDeltaRotationVector[1]/mRotationVectorCount * mGyroscopeScaleY);
             mDeltaRotationVector[0] = 0;
             mDeltaRotationVector[1] = 0;
+            mRotationVectorCount = 0;
         }
 //      Log.v(TAG, "gyro: " + deltaRotationVector[0] + ", " + deltaRotationVector[1]);
         return deltaRotationVector;
     }
 
-    public float[] getDeltaTranslationVector(){
-        float [] deltaTranslationVector = {0, 0};
+    public float getTranslationSpeed(){
+        float speed;
         synchronized (mSynchronizeSensor) {
-            deltaTranslationVector[0] = (mDeltaTranslationVector[0] * ACCELEROMETER_SCALE);
-            deltaTranslationVector[1] = (mDeltaTranslationVector[1] * ACCELEROMETER_SCALE);
-            mDeltaTranslationVector[0] = 0;
-            mDeltaTranslationVector[1] = 0;
+            speed = mTranslationSpeed;
         }
+        return speed;
 //        Log.v(TAG, "accelerometer: " + deltaTranslationVector[0] + ", " + deltaTranslationVector[1]);
-        return deltaTranslationVector;
     }
 
     public void setGyroscopeScale(float scaleX, float scaleY) {

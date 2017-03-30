@@ -76,7 +76,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 //        return processOpticalFlowFarneback(inputFrame);
         Mat newRgba = mOpticalFlowManager.processOpticalFlowLK(inputFrame);
 //        mSensorProvider.getDeltaRotationVector();
-//        mSensorProvider.getDeltaTranslationVector();
+//        mSensorProvider.getTranslationSpeed();
         return newRgba;
     }
 }

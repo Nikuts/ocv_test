@@ -37,14 +37,14 @@ public class OpticalFlowResultProcessor {
     }
 
     public void processPoint(Point point){
-        if ((point.x > 0) && (point.y < 1/Math.sqrt(3) * point.x) && (point.y >= - 1/Math.sqrt(3) * point.x)) mTop.add(point);//mBottom.add(point); //mRight.add(point);
-        if ((point.x > 0) && (point.y < Math.sqrt(3) * point.x) && (point.y >= 1/Math.sqrt(3) * point.x)) mRightBottom.add(point);//mLeftBottom.add(point); //mRightTop.add(point);
-        if ((point.y > 0) && (point.x >= point.y / (- Math.sqrt(3))) && (point.x < point.y/Math.sqrt(3))) mRight.add(point);//mLeft.add(point); // mTop.add(point);
-        if ((point.x < 0) && (point.y < point.x * - Math.sqrt(3)) && (point.y >= point.x * - 1/Math.sqrt(3))) mRightTop.add(point);//mLeftTop.add(point);
-        if ((point.x < 0) && (point.y < -1/Math.sqrt(3) * point.y) && (point.y >= 1/Math.sqrt(3) * point.x)) mBottom.add(point);//mTop.add(point); //mLeft.add(point);
-        if ((point.x < 0) && (point.y < 1/Math.sqrt(3) * point.x) && (point.y >= Math.sqrt(3) * point.x)) mLeftTop.add(point);//mRightTop.add(point); //mLeftBottom.add(point);
-        if ((point.y < 0) && (point.x >= point.y/Math.sqrt(3)) && (point.x < point.y/-Math.sqrt(3))) mLeft.add(point);//mRight.add(point); //mBottom.add(point);
-        if ((point.x > 0) && (point.y >= -Math.sqrt(3) * point.x) && (point.y < -1/Math.sqrt(3) * point.x)) mLeftBottom.add(point);//mRightBottom.add(point);
+        if ((point.x > 0) && (point.y < 1/Math.sqrt(3) * point.x) && (point.y >= - 1/Math.sqrt(3) * point.x)) mRight.add(point);
+        if ((point.x > 0) && (point.y < Math.sqrt(3) * point.x) && (point.y >= 1/Math.sqrt(3) * point.x)) mRightTop.add(point);
+        if ((point.y > 0) && (point.x >= point.y / (- Math.sqrt(3))) && (point.x < point.y/Math.sqrt(3))) mTop.add(point);
+        if ((point.x < 0) && (point.y < point.x * - Math.sqrt(3)) && (point.y >= point.x * - 1/Math.sqrt(3))) mLeftTop.add(point);
+        if ((point.x < 0) && (point.y < -1/Math.sqrt(3) * point.y) && (point.y >= 1/Math.sqrt(3) * point.x)) mLeft.add(point);
+        if ((point.x < 0) && (point.y < 1/Math.sqrt(3) * point.x) && (point.y >= Math.sqrt(3) * point.x)) mLeftBottom.add(point);
+        if ((point.y < 0) && (point.x >= point.y/Math.sqrt(3)) && (point.x < point.y/-Math.sqrt(3))) mBottom.add(point);
+        if ((point.x > 0) && (point.y >= -Math.sqrt(3) * point.x) && (point.y < -1/Math.sqrt(3) * point.x)) mRightBottom.add(point);
     }
 
     public ArrayList<Point> processResults(){
@@ -98,7 +98,7 @@ public class OpticalFlowResultProcessor {
             maxDirection = "";
             maxPoints = null;
         }
-        Log.v(TAG, "Direction: " + maxDirection + "; count: " + max);
+//        Log.v(TAG, "Direction: " + maxDirection + "; count: " + max);
         return maxPoints;
     }
 }
