@@ -1,4 +1,4 @@
-package com.nikita.opencvjavatest;
+package com.nikita.opencvjavatest.filters;
 
 import org.opencv.core.Point;
 

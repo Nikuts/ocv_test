@@ -1,6 +1,4 @@
-package com.nikita.opencvjavatest;
-
-import android.util.Log;
+package com.nikita.opencvjavatest.opticalflow;
 
 import org.opencv.core.Point;
 

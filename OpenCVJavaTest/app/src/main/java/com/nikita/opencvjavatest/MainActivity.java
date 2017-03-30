@@ -7,6 +7,8 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import com.androidcv.R;
+import com.nikita.opencvjavatest.opticalflow.OpticalFlowManager;
+import com.nikita.opencvjavatest.sensors.SensorProvider;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;

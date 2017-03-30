@@ -1,6 +1,9 @@
-package com.nikita.opencvjavatest;
+package com.nikita.opencvjavatest.opticalflow;
 
 import android.util.Log;
+
+import com.nikita.opencvjavatest.filters.KalmanFilterSimple;
+import com.nikita.opencvjavatest.sensors.SensorProvider;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.CvType;
@@ -44,14 +47,14 @@ public class OpticalFlowManager {
 
     private SensorProvider mSensorProvider;
     private OpticalFlowResultProcessor mOpticalFlowResultProcessor;
-    private KalmanFilterSimple mKalmanFilterSimpleSum;
+    private KalmanFilterSimple mKalmanFilterSimple;
 
     public OpticalFlowManager(SensorProvider sensorProvider) {
         mSensorProvider = sensorProvider;
         mSensorProvider.setGyroscopeScale(SCALE, SCALE);
 
-        mKalmanFilterSimpleSum = new KalmanFilterSimple(2, 4, 1, 1);
-        mKalmanFilterSimpleSum.setState(new Point(0, 0), new Point(0.1, 0.1));
+        mKalmanFilterSimple = new KalmanFilterSimple(4, 8, 1, 1);
+        mKalmanFilterSimple.setState(new Point(0, 0), new Point(0.1, 0.1));
 
         mOpticalFlowResultProcessor = new OpticalFlowResultProcessor();
 
@@ -144,7 +147,7 @@ public class OpticalFlowManager {
             sum.y *= SCALE;
         }
 
-        sum = mKalmanFilterSimpleSum.correct(sum);
+        sum = mKalmanFilterSimple.correct(sum);
         if ((Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2)) < MIN_OPTFLOW_BORDER) &&
                 (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2)) > MAX_OPTFLOW_BORDER))
             sum = new Point(0, 0);

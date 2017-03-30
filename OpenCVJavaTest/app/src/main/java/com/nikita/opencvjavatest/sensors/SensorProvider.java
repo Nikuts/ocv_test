@@ -1,4 +1,4 @@
-package com.nikita.opencvjavatest;
+package com.nikita.opencvjavatest.sensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
