@@ -5,7 +5,7 @@ import android.util.Log;
 import com.nikita.opencvjavatest.filters.KalmanFilterSimple;
 import com.nikita.opencvjavatest.sensors.SensorProvider;
 
-import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.CameraBridgeNoView;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -74,7 +74,7 @@ public class OpticalFlowManager {
         mCenterPoint = new Point();
     }
 
-    public Mat processOpticalFlowLK(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
+    public Mat processOpticalFlowLK(CameraBridgeNoView.CvCameraViewFrame inputFrame){
         mRgba = inputFrame.rgba();
         MatOfPoint MOPcorners = new MatOfPoint();
         int iGFFTMax = 80;
@@ -163,7 +163,7 @@ public class OpticalFlowManager {
 
     }
 
-    public Mat processOpticalFlowFarneback(CameraBridgeViewBase.CvCameraViewFrame inputFrame){
+    public Mat processOpticalFlowFarneback(CameraBridgeNoView.CvCameraViewFrame inputFrame){
         mRgba = inputFrame.rgba();
         if (matOpFlowPrev.rows() == 0) {
             Imgproc.cvtColor(mRgba, matOpFlowThis, Imgproc.COLOR_RGBA2GRAY);

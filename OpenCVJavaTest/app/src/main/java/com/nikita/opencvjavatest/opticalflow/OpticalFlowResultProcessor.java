@@ -1,5 +1,7 @@
 package com.nikita.opencvjavatest.opticalflow;
 
+import android.util.Log;
+
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
@@ -96,7 +98,7 @@ public class OpticalFlowResultProcessor {
             maxDirection = "";
             maxPoints = null;
         }
-//        Log.v(TAG, "Direction: " + maxDirection + "; count: " + max);
+        Log.v(TAG, "Direction: " + maxDirection + "; count: " + max);
         return maxPoints;
     }
 }
