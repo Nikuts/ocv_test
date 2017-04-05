@@ -3,6 +3,7 @@ package com.nikita.ocvgvrfapp.opencv.opticalflow;
 import android.util.Log;
 
 import com.nikita.ocvgvrfapp.opencv.filters.KalmanFilterSimple;
+import com.nikita.ocvgvrfapp.opencv.filters.MovingAverage;
 import com.nikita.ocvgvrfapp.opencv.sensors.SensorProvider;
 
 import org.opencv.android.CameraBridgeNoView;
@@ -23,10 +24,10 @@ import java.util.List;
 
 public class OpticalFlowManager {
     private static final String TAG = OpticalFlowManager.class.getSimpleName();
-    private static final float MIN_OPTFLOW_BORDER = 6.0f; //8
+    private static final float MIN_OPTFLOW_BORDER = 4.0f; //8
     private static final float MAX_OPTFLOW_BORDER = 30.0f;
 
-    private static final float ROTATION_BORDER = 10.0f;
+    private static final float ROTATION_BORDER = 8.0f;
 //    private static final float TRANSLATION_BORDER = 400.0f;
 
     private static final float SCALE = 1;
@@ -47,14 +48,17 @@ public class OpticalFlowManager {
 
     private SensorProvider mSensorProvider;
     private OpticalFlowResultProcessor mOpticalFlowResultProcessor;
-    private KalmanFilterSimple mKalmanFilterSimple;
+    //    private KalmanFilterSimple mKalmanFilterSimple;
+    private MovingAverage mMovingAverage;
 
     public OpticalFlowManager(SensorProvider sensorProvider) {
         mSensorProvider = sensorProvider;
         mSensorProvider.setGyroscopeScale(SCALE, SCALE);
 
-        mKalmanFilterSimple = new KalmanFilterSimple(4, 8, 1, 1);
-        mKalmanFilterSimple.setState(new Point(0, 0), new Point(0.1, 0.1));
+//        mKalmanFilterSimple = new KalmanFilterSimple(4, 8, 1, 1);
+//        mKalmanFilterSimple.setState(new Point(0, 0), new Point(0.1, 0.1));
+
+        mMovingAverage = new MovingAverage(6);
 
         mOpticalFlowResultProcessor = new OpticalFlowResultProcessor();
 
@@ -74,10 +78,10 @@ public class OpticalFlowManager {
         mCenterPoint = new Point();
     }
 
-    public Mat processOpticalFlowLK(CameraBridgeNoView.CvCameraViewFrame inputFrame){
+    public Point processOpticalFlowLK(CameraBridgeNoView.CvCameraViewFrame inputFrame){
         mRgba = inputFrame.rgba();
         MatOfPoint MOPcorners = new MatOfPoint();
-        int iGFFTMax = 80;
+        int iGFFTMax = 100;
         if (mMOP2fptsPrev.rows() == 0) {
             Imgproc.cvtColor(mRgba, matOpFlowThis, Imgproc.COLOR_RGBA2GRAY);
 
@@ -147,19 +151,21 @@ public class OpticalFlowManager {
             sum.y *= SCALE;
         }
 
-        sum = mKalmanFilterSimple.correct(sum);
-        if ((Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2)) < MIN_OPTFLOW_BORDER) &&
+//        sum = mKalmanFilterSimple.correct(sum);
+        sum = mMovingAverage.filter(sum);
+        Log.v(TAG, "sum length: " + (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2))));
+        if ((Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2)) < MIN_OPTFLOW_BORDER) ||
                 (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2)) > MAX_OPTFLOW_BORDER))
             sum = new Point(0, 0);
 
-        Log.v(TAG, "sum length: " + (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2))));
+        Log.v(TAG, "result sum length: " + (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2))));
 
-        Point outPoint = new Point(mCenterPoint.x + sum.x, mCenterPoint.y + sum.y);
-        Imgproc.line(mRgba, mCenterPoint, outPoint, new Scalar(255, 0, 0), 2);
-        Imgproc.line(mRgba, new Point(mCenterPoint.x - 10, mCenterPoint.y), new Point(mCenterPoint.x - 10 + deltaRotationVector[0], mCenterPoint.y - deltaRotationVector[1]), new Scalar(0,255,0), 2);
+//        Point outPoint = new Point(mCenterPoint.x + sum.x, mCenterPoint.y + sum.y);
+//        Imgproc.line(mRgba, mCenterPoint, outPoint, new Scalar(0, 0, 255), 2);
+//        Imgproc.line(mRgba, new Point(mCenterPoint.x - 10, mCenterPoint.y), new Point(mCenterPoint.x - 10 + deltaRotationVector[0], mCenterPoint.y - deltaRotationVector[1]), new Scalar(0,255,0), 2);
 
         mOpticalFlowResultProcessor.clear();
-        return mRgba;
+        return sum;
 
     }
 

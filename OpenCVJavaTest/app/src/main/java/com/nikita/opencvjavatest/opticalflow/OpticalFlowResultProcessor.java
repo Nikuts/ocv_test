@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class OpticalFlowResultProcessor {
     private static final String TAG = OpticalFlowResultProcessor.class.getSimpleName();
-    private static final int MIN_POINTS_COUNT = 8;
+    private static final int MIN_POINTS_COUNT = 4;
 
     private ArrayList<Point> mRight = new ArrayList<>();
     private ArrayList<Point> mRightTop = new ArrayList<>();
@@ -92,7 +92,6 @@ public class OpticalFlowResultProcessor {
             maxDirection = "RightBottom";
             maxPoints = mRightBottom;
         }
-
         if (max <= MIN_POINTS_COUNT){
             max = 0;
             maxDirection = "";

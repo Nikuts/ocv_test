@@ -12,16 +12,19 @@ import org.opencv.android.CameraBridgeNoView;
 import org.opencv.android.JavaCameraNoView;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 
 public class MainActivity extends GVRActivity implements CameraBridgeNoView.CvCameraViewListener2 {
     private CameraBridgeNoView mOpenCvCameraNoView = null;
     private OpticalFlowManager mOpticalFlowManager = null;
     private SensorProvider mSensorProvider = null;
+    private VrMain mVrMain;
 
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        setMain(new VrMain());
+        mVrMain = new VrMain();
+        setMain(mVrMain);
         mOpenCvCameraNoView = new JavaCameraNoView(this, CameraBridgeNoView.CAMERA_ID_ANY);
         mOpenCvCameraNoView.enableFpsMeter();
         mOpenCvCameraNoView.SetCaptureFormat(CameraBridgeNoView.GRAY);
@@ -70,7 +73,8 @@ public class MainActivity extends GVRActivity implements CameraBridgeNoView.CvCa
 
     @Override
     public Mat onCameraFrame(CameraBridgeNoView.CvCameraViewFrame inputFrame) {
-        Mat newRgba = mOpticalFlowManager.processOpticalFlowLK(inputFrame);
-        return newRgba;
+        Point rotationVector = mOpticalFlowManager.processOpticalFlowLK(inputFrame);
+        mVrMain.setRotationVector(rotationVector);
+        return null;
     }
 }
