@@ -47,4 +47,5 @@ dependencies {
     compile "org.gearvrf:backend_daydream:$gearvrfVersion"
     compile "org.gearvrf:backend_oculus:$gearvrfVersion"
     compile 'com.google.vr:sdk-base:1.30.0'
+    compile project(path: ':openCVLibrary320')
 }
