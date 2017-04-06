@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class SensorProvider implements SensorEventListener {
     private static final String TAG = SensorProvider.class.getSimpleName();
-    private static final float DEFAULT_GYROSCOPE_SCALE_X = 13.0f; //8.2f;
+    private static final float DEFAULT_GYROSCOPE_SCALE_X = 13.5f; //8.2f;
     private static final float DEFAULT_GYROSCOPE_SCALE_Y = DEFAULT_GYROSCOPE_SCALE_X; //+ 0.3f;
     private static final float ACCELEROMETER_NOISE = 0.2f;
     private static final String mSynchronizeSensor = "mSynchronizeSensor";
@@ -17,6 +17,7 @@ public class SensorProvider implements SensorEventListener {
     private int mRotationVectorCount = 0;
 
     private float [] mDeltaRotationVector = {0, 0};
+    private float [] mPrevDeltaRotationVector = {0,0};
     private float [] mLastTranslationVector = {0, 0};
     private float [] mDeltaTranslationVector = {0, 0};
     private float mTranslationSpeed = 0;
@@ -86,8 +87,10 @@ public class SensorProvider implements SensorEventListener {
     public float[] getDeltaRotationVector(){ //ox: same direction, oy: opposite direction
         float[] deltaRotationVector = {0, 0};
         synchronized (mSynchronizeSensor) {
-            deltaRotationVector[0] = (mDeltaRotationVector[0]/mRotationVectorCount * mGyroscopeScaleX);
-            deltaRotationVector[1] = (mDeltaRotationVector[1]/mRotationVectorCount * mGyroscopeScaleY);
+            deltaRotationVector[0] = (( -mDeltaRotationVector[0]/mRotationVectorCount + mPrevDeltaRotationVector[0]) * mGyroscopeScaleX);
+            deltaRotationVector[1] = (( -mDeltaRotationVector[1]/mRotationVectorCount + mPrevDeltaRotationVector[1]) * mGyroscopeScaleY);
+            mPrevDeltaRotationVector[0] = mDeltaRotationVector[0];
+            mPrevDeltaRotationVector[1] = mDeltaRotationVector[1];
             mDeltaRotationVector[0] = 0;
             mDeltaRotationVector[1] = 0;
             mRotationVectorCount = 0;

@@ -24,7 +24,7 @@ import java.util.List;
 
 public class OpticalFlowManager {
     private static final String TAG = OpticalFlowManager.class.getSimpleName();
-    private static final float MIN_OPTFLOW_BORDER = 4.0f; //8
+    private static final float MIN_OPTFLOW_BORDER = 4.5f; //8
     private static final float MAX_OPTFLOW_BORDER = 30.0f;
 
     private static final float ROTATION_BORDER = 8.0f;
@@ -153,12 +153,15 @@ public class OpticalFlowManager {
 
 //        sum = mKalmanFilterSimple.correct(sum);
         sum = mMovingAverage.filter(sum);
-        Log.v(TAG, "sum length: " + (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2))));
+//        Log.v(TAG, "sum length: " + (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2))));
         if ((Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2)) < MIN_OPTFLOW_BORDER) ||
                 (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2)) > MAX_OPTFLOW_BORDER))
             sum = new Point(0, 0);
 
-        Log.v(TAG, "result sum length: " + (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2))));
+//        if (sum.x != 0 && sum.y != 0) {
+//            Log.v(TAG, "sum length: " + (Math.sqrt(Math.pow(sum.x, 2) + Math.pow(sum.y, 2))));
+//            Log.v(TAG, "deltaRotation: " + (Math.sqrt(Math.pow(deltaRotationVector[0], 2) + Math.pow(deltaRotationVector[1], 2))));
+//        }
 
 //        Point outPoint = new Point(mCenterPoint.x + sum.x, mCenterPoint.y + sum.y);
 //        Imgproc.line(mRgba, mCenterPoint, outPoint, new Scalar(0, 0, 255), 2);
